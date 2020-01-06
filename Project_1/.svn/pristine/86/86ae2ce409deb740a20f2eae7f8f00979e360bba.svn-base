@@ -1,0 +1,89 @@
+var Comment = require('../models/comment');
+var _ = require('lodash');
+var authenticate = require('../../middleware/authenticate');
+var response = require('../core/response');
+
+module.exports.run = (app, io) => {
+    app.post('/comment/add-comment', [authenticate.checkLogin], (req, res) => {
+        var comment = req.body;
+        if (comment) {
+            commentPost = {
+                postId: comment.postId,
+                memberId: comment.memberId,
+                parentId: comment.parentId,
+                content: comment.content
+            }
+            Comment.insert(commentPost).then((msg) => {
+                return res.jsonp(msg);
+            }).catch(err => {
+                console.log(err);
+            });
+        }
+    });
+
+    app.put('/comment/hide', [authenticate.checkLogin], (req, res) => {
+        var commentId = req.body.commentId || 0;
+        var memberId = req.body.memberId || 0;
+        var comment = Comment.getById(commentId);
+        console.log(comment);
+        if (commentId <= 0 || memberId <= 0) {
+            res.send(response.error('missing parameter @commentId, @memberId!'));
+        } else if (memberId != comment.MemberId){
+            res.send(response.error('you do not have permission!'));
+        } else {
+            Comment.hide(commentId).then((msg) => {
+                return res.jsonp(msg);
+            }).catch(err => {
+                console.log(err);
+            });
+        }
+    });
+
+    app.put('/comment/edit', [authenticate.checkLogin], (req, res) => {
+        var commentId = req.body.comment_id || 0;
+        var memberId = req.body.memberId || 0;
+        var comment = Comment.getById(commentId);
+        var newContent = req.body.content;
+        if (commentId <= 0 || memberId <= 0) {
+            res.send(response.error('missing parameter @commmentId, @memberId!'));
+        } else if (memberId != comment.MemberId){
+            res.send(response.error('you do not have permission!'))
+        } else {
+            Comment.update(id, newContent).then((msg) => {
+                return res.jsonp(msg);
+            }).catch(err => {
+                console.log(err);
+            });
+        }
+    });
+
+    app.get('/comment/', [authenticate.checkApiSecretKey], (req, res) => {
+        var postId = req.body.postId || 0;
+        var pageSize = req.body.pageSize || 10;
+        var pageIndex = req.body.pageIndex || 1;
+        if (postId <= 0) {
+            res.send(response.error('missing parameter @postId!'));
+        } else {
+            Comment.getCommentsByPostId(postId, pageSize, pageIndex).then(function (msg) {
+                return res.jsonp(msg);
+            }).catch(err => {
+                console.log(err);
+            });
+        }
+    });
+
+    app.get('/comment/children', [authenticate.checkApiSecretKey], (req, res) => {
+        var parentId = req.body.parentId || 0;
+        var pageSize = req.body.pageSize || 10;
+        var pageIndex = req.body.pageIndex || 1;
+        if (parentId <= 0) {
+            res.send(response.error('missing parameter @id!'));
+        } else {
+            Comment.getCommentsByParentId(parentId, pageSize, pageIndex).then(function (msg) {
+                return res.jsonp(msg);
+            }).catch(err => {
+                console.log(err);
+            });
+        }
+    });
+}

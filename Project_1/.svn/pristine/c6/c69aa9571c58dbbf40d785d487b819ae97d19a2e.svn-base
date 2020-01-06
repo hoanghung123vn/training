@@ -1,0 +1,34 @@
+const config = require('../../config'),
+    cache = require('memory-cache'),
+    Cryptr = require('cryptr'),
+    cryptr = new Cryptr(config.EncryptKey),
+    keysToCamelcase = require('keys-to-camelcase');
+
+var timeOut = 24 * 60 * 1000;
+module.exports = {
+    addCache: function (cacheKey, data, time) {
+        if (!time)
+            time = timeOut;
+        return cache.put(cacheKey, data, time);
+    },
+    getCache: function (cacheKey) {
+        return cache.get(cacheKey);
+    },
+    removeCache: function (cacheKey) {
+        return cache.del(cacheKey);
+    },
+    removeAllCache: function () {
+        return cache.clear();
+    },
+    encrypt: function (text) {
+        return cryptr.encrypt(text);
+    },
+    decrypt: function (cryptrText) {
+        return cryptr.decrypt(cryptrText)
+    },
+    camelCase: function (data) {
+        if (data)
+            return keysToCamelcase(data);
+        return null;
+    }
+}

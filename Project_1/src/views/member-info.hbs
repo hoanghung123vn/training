@@ -1,0 +1,42 @@
+<h3>Thông tin</h3>
+<table>
+    <tr>
+        <td style="width:100px;">Giới tính</td>
+        <td>{{Gender}}</td>
+    </tr>
+    <tr>
+        <td>Ngày hết hạn</td>
+        <td>{{ExpiredDate}}</td>
+    </tr>
+    <tr>
+        <td>Trình độ</td>
+        <td>{{Level}}</td>
+    </tr>
+    <tr>
+        <td>Email</td>
+        <td><a class="truncate" style="width:100px; display:inline-block;" href="mailto:{{Email}}">{{Email}}</a></td>
+    </tr>
+    <tr>
+        <td>Số điện thoại</td>
+        <td>{{Mobile}}</td>
+    </tr>
+    <tr>
+        <td>Profile</td>
+        <td>{{ProfileUrl}}</td>
+    </tr>
+</table>
+<h3>Ghi chú <span id="show-add-note">Thêm ghi chú</span></h3>
+<i>Ghi chú giúp bạn theo dõi cuộc trò chuyện của mình.</i>
+<div id="list-note">
+    {{#each notes}}
+    <div class="note-item" data-id="{{_id}}">
+        <b>{{content}}</b>
+        <span class="btn btn-link delete-note no-margin no-padding">Xóa</span>
+    </div>
+    {{/each}}
+</div>
+<div id="add-note">
+    <textarea placeholder="Nhập nội dung ghi chú" id="note-txt"></textarea>
+    <span class="btn" id="add-note-btn">Thêm</span>
+    <span class="btn btn-link" id="cancel-note">Hủy</span>
+</div>

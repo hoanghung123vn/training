@@ -1,0 +1,22 @@
+ {{#each messages}}
+<li data-temp-id="{{temp_id}}" data-id="{{_id}}" class="dchat-message-item {{cls}}" data-type="{{type}}" data-created-by="{{created_by}}">
+    <div class="deriku-image-wraper" data-member="{{created_by}}">
+        <img src="{{avatar}}" alt="{{title}}" class="{{avatarCls}}" data-name="{{avatar}}">
+    </div>
+    <b class="dchat-message-sender-name">{{name}}</b><i class="dchat-message-sender-time">{{moment created_date lang='vi' fromNow = 'start hour'}} trước</i>
+    <div class="clearfix"></div>
+    <ul class="dchat-message-item-list">
+        {{#if is_file}}
+        <li data-temp-id="" data-id="{{_id}}" class="dchat-message-item-child {{cls}}" data-type="{{type}}" data-parent-id="{{parent_id}}"
+            title="{{created_by_name}}" data-temp-file-id="{{payload.id}}" data-file-url="{{payload.url}}">
+            <span>{{{content}}}</span> </li>
+        {{else}}
+        <li data-temp-id="" data-id="{{_id}} " class="dchat-message-item-child {{cls}}" data-type="{{type}}" data-parent-id="{{parent_id}}"
+            title="{{created_by_name}}">
+            <span>{{{content}}}</span> </li>
+        {{/if}}
+    </ul>
+</li>
+{{else}}
+<li class="empty-message">Hãy bắt đầu trò chuyện nào! Nếu bạn không mở lời thì ai sẽ là người đầu tiên?</li>
+{{/each}}

@@ -1,0 +1,104 @@
+var express = require('express'),
+    http = require('http'),
+    https = require('https'),
+    path = require('path'),
+    app = express(),
+    fs = require('fs'),
+    bodyParser = require('body-parser'),
+    compression = require('compression'),
+    hbs = require('express-hbs'),
+    config = require('./config'),
+    cors = require('cors'),
+    port = config.server.port;
+var helpers = require('handlebars-helpers')(hbs);
+
+require('events').EventEmitter.defaultMaxListeners = 0;
+
+app.use(compression());
+
+// some environment variables
+app.set('port', config.server.port);
+app.set('etag', false);
+app.enable('trust proxy');
+app.disable('x-powered-by', false);
+app.use(bodyParser.urlencoded({ extended: false }))
+
+//enable cors
+app.use(cors());
+
+// parse application/json
+app.use(bodyParser.json());
+
+app.engine('hbs', hbs.express4({
+    partialsDir: __dirname + '/src/views/partials'
+}));
+app.set('view engine', 'hbs');
+app.set('views', __dirname + '/src/views');
+app.use(express.static(__dirname + '/public'));
+
+
+app.get('/robots.txt', function(req, res) {
+    res.type('text/plain');
+    res.send("User-agent: *\nDisallow: /");
+});
+
+
+var server = http.createServer(app);
+//realtime
+var io = require('socket.io');
+io = io(server);
+
+// dynamically include routes (controller)
+fs.readdirSync('./src/controllers').forEach(function(file) {
+    if (file.substr(-3) == '.js') {
+        route = require('./src/controllers/' + file);
+        route.run(app, io);
+    }
+});
+// dynamically include routes (CMS controller)
+fs.readdirSync('./src/controllers/cms').forEach(function(file) {
+    if (file.substr(-3) == '.js') {
+        route = require('./src/controllers/cms/' + file);
+        route.run(app, io);
+    }
+});
+
+// dynamically include services
+/*
+fs.readdirSync('./src/services').forEach(function(file) {
+    if (file.substr(-3) == '.js') {
+        service = require('./src/services/' + file);
+        service.run(app, io);
+    }
+});
+*/
+
+//dynamically include realtime
+// fs.readdirSync('./src/realtime').forEach(function(file) {
+//     if (file.substr(-3) == '.js') {
+//         rt = require('./src/realtime/' + file);
+//         rt.init(app, io);
+//     }
+// });
+
+app.use(function(req, res, next) {
+    if (req.url == '/favicon.ico') {
+        res.writeHead(200, { 'Content-Type': 'image/x-icon' });
+        res.end();
+    } else {
+        req.io = io;
+        next();
+    }
+});
+
+//var sql = require('mssql');
+//sql.connect(config.mainDB).then(function() {
+    server.listen(app.get('port'), function() {
+        console.log('Express server listening on port ' + app.get('port') + ", mode: " + (process.env.NODE_ENV || 'development'));
+    });
+    process.setMaxListeners(0);
+    process.on('uncaughtException', function(err) {
+        console.error((new Date).toUTCString() + ' uncaughtException:', err.message)
+        console.error(err.stack);
+    });
+//});

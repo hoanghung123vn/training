@@ -1,0 +1,27 @@
+body{
+    padding: 50px;
+    font: 16px 'Lucida Grand', Helvetica, Arial, sans-serif;
+}
+a{
+    color: #00B7FF;
+}
+#content{
+    width: 800px;
+    margin: 0 auto;
+}
+#room{
+    background-color: #ddd;
+    margin-bottom: 1em;
+}
+#messages{
+    width: 690px;
+    height: 300px;
+    background-color: #eee;
+    margin-bottom: 1em;
+    margin-right: 10px;
+    overflow: auto
+}
+#send-button{
+    border-radius: 5px;
+    box-shadow: 2px 2px rgba(61, 60, 57, 0.952);
+}

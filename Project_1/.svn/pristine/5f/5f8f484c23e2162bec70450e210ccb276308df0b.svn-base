@@ -1,0 +1,96 @@
+'use strict';
+const config = require('../../../config'),
+    Pool = require('../../core/mssql'),
+    sql = require("mssql"),
+    Promise = require('bluebird'),
+    response = require('../../core/response');
+
+class CPost {
+    constructor() {
+
+    }
+    getById(id) {
+        return new Promise((resolve, reject) => {
+            Pool.mainDb().then(function (db) {
+                var request = db.request();
+                request.input('Id', sql.BigInt, id);
+                request.query('select Id,Title,Type,Thumb,Path,MemberId,Status,Duration,CreatedDate, ViewCount, CommentCount, LikeCount from [Post] where Id = @Id').then(result => {
+                    if (result.rowsAffected == 1) {
+                        return resolve(response.success(result.recordset[0]));
+                    } else {
+                        return reject(response.error('Post not found!'));
+                    }
+                }).catch(err => {
+                    console.log(err);
+                    return reject(err);
+                });
+            }).catch(err => {
+                return resolve(response.error(err));
+            });
+        });
+    }
+    search(memberId, keyword, zoneId, status, IsShow, pageIndex, pageSize) {
+        return new Promise((resolve, reject) => {
+            var TotalRows = 0;
+            if (keyword != '')
+                keyword = '%' + keyword + '%';
+            Pool.mainDb().then(function (db) {
+                var request = db.request();
+                request.input('MemberId', sql.Int, memberId);
+                request.input('Keyword', sql.NVarChar(250), keyword);
+                request.input('ZoneId', sql.Int, zoneId);
+                request.input('Status', sql.Int, status);
+                request.input('IsShow', sql.Bit, IsShow == 1 ? true : false);
+                request.input('PageIndex', sql.Int, pageIndex);
+                request.input('PageSize', sql.Int, pageSize);
+                request.output('TotalRows', sql.Int, TotalRows)
+
+                var where = " Where 1 = 1";
+                if (memberId > 0)
+                    where += " And MemberId = @MemberId";
+                if (status >= 0)
+                    where += " And p.Status = @Status";
+                if (keyword != '')
+                    where += " And (@Keyword = '' OR PATINDEX(@Keyword, p.Title) > 0)";
+                if (IsShow > -1)
+                    where += " And IsShow = @IsShow";
+
+                request.query(`SELECT * FROM  (SELECT p.Id,p.Title,p.Type,p.Thumb,p.Path,p.MemberId,p.Status,p.Duration,p.CreatedDate, p.ViewCount, p.CommentCount, p.LikeCount,p.IsShow,m.UserName, m.FullName, m.Avatar, row_number() OVER (Order By p.CreatedDate DESC) AS RowNum  
+                            FROM Post p INNER JOIN Member m on p.MemberId = m.Id `+ where + `) AS T
+                            WHERE RowNum BETWEEN ((@PageIndex - 1) * @PageSize + 1) AND (@PageIndex * @PageSize)
+                            Order By T.CreatedDate DESC; 
+                            SELECT @TotalRows = COUNT(0) FROM Post p `+ where).then(result => {
+                        return resolve(response.success(result.recordset, result.output.TotalRows));
+                    }).catch(err => {
+                        return resolve(response.error('Đã có lỗi xảy ra!'));
+                    });
+            }).catch(err => {
+                return resolve(response.error(err));
+            });
+        });
+    }
+
+    changeStatus(postId, status) {
+        return new Promise((resolve, reject) => {
+            Pool.mainDb().then(function (db) {
+                var request = db.request();
+                request.input('Id', sql.BigInt, postId);
+                request.input('Status', sql.Int, status);
+                request.query('Update Post set Status = @Status Where Id = @Id').then(result => {
+                    if (result.rowsAffected > 0) {
+                        return resolve(response.success());
+                    } else {
+                        return reject(new Error('Post not found!'));
+                    }
+                }).catch(err => {
+                    console.log(err);
+                    return resolve(response.error(err));
+                });
+            }).catch(err => {
+                return resolve(response.error(err));
+            });
+        });
+    }
+}
+
+module.exports = new CPost();

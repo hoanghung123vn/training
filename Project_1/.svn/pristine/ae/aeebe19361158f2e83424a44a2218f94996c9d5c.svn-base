@@ -1,0 +1,159 @@
+'use strict';
+const config = require('../../config'),
+    sql = require('mssql'),
+    Promise = require('bluebird'),
+    response = require('../core/response');
+
+class Post {
+    constructor() {
+
+    }
+    getById(id) {
+        return new Promise((resolve, reject) => {
+            var request = new sql.Request();
+            request.input('Id', sql.BigInt, id);
+            request.query('select Id,Title,Type,Thumb,Path,MemberId,Status,Duration,CreatedDate, ViewCount, CommentCount, LikeCount from [Post] where Id = @Id').then(result => {
+                if (result.rowsAffected == 1) {
+                    return resolve(response.success(result.recordset[0]));
+                } else {
+                    return reject(response.error('Post not found!'));
+                }
+            }).catch(err => {
+                console.log(err);
+                return reject(err);
+            });
+            sql.on('error', err => {
+                console.log(err);
+                return reject(err);
+            });
+        });
+    }
+    search(memberId, keyword, zoneId, isLive, pageIndex, pageSize) {
+        return new Promise((resolve, reject) => {
+            var TotalRows = 0;
+            if (keyword != '')
+                keyword = '%' + keyword + '%';
+            var request = new sql.Request();
+            request.input('MemberId', sql.Int, memberId);
+            request.input('Keyword', sql.NVarChar(250), keyword);
+            request.input('ZoneId', sql.Int, zoneId);
+            request.input('IsLive', sql.Bit, isLive);
+            request.input('PageIndex', sql.Int, pageIndex);
+            request.input('PageSize', sql.Int, pageSize);
+            request.output('TotalRows', sql.Int, TotalRows)
+
+            var where = " Where Status = 1";
+            if (memberId > 0)
+                where += " And MemberId = @MemberId";
+            if (keyword != '')
+                where += " And (@Keyword = '' OR PATINDEX(@Keyword, Title) > 0)";
+            if (isLive > -1)
+                where += " And IsLive = @IsLive";
+
+            request.query(`SELECT * FROM  (SELECT Id,Title,Type,Thumb,Path,MemberId,Status,Duration,CreatedDate, ViewCount, CommentCount, LikeCount,
+                            row_number() OVER (Order By CreatedDate DESC) AS RowNum  
+                            FROM Post `+ where +`) AS M
+                            WHERE RowNum BETWEEN ((@PageIndex - 1) * @PageSize + 1) AND (@PageIndex * @PageSize)
+                            Order By M.CreatedDate DESC; 
+                            SELECT @TotalRows = COUNT(0) FROM Post `+ where).then(result => {
+                return resolve(response.success(result.recordset, result.output.TotalRows));
+            }).catch(err => {
+                return resolve(response.error('Đã có lỗi xảy ra!'));
+            });
+            sql.on('error', err => {
+                console.log(err);
+                return reject(err);
+            });
+        });
+    }
+    getListByMember(memberId, pageIndex, pageSize) {
+        return new Promise((resolve, reject) => {
+            var TotalRows = 0;
+            var request = new sql.Request();
+            request.input('MemberId', sql.Int, memberId);
+            request.input('PageIndex', sql.Int, pageIndex);
+            request.input('PageSize', sql.Int, pageSize);
+            request.output('TotalRows', sql.Int, TotalRows)
+            request.query(`SELECT * FROM  (SELECT Id,Title,Type,Thumb,Path,MemberId,Status,Duration,CreatedDate, ViewCount, CommentCount, LikeCount,
+                            row_number() OVER (Order By CreatedDate DESC) AS RowNum  
+                            FROM Post WHERE MemberId = @MemberId AND Status = 1) AS M
+                            WHERE RowNum BETWEEN ((@PageIndex - 1) * @PageSize + 1) AND (@PageIndex * @PageSize)
+                            Order By M.CreatedDate DESC; 
+                            SELECT @TotalRows = COUNT(0) FROM Post AS M WHERE M.MemberId = @MemberId`).then(result => {
+                return resolve(response.success(result.recordset, result.output.TotalRows));
+            }).catch(err => {
+                return resolve(response.error('Đã có lỗi xảy ra!'));
+            });
+            sql.on('error', err => {
+                console.log(err);
+                return reject(err);
+            });
+        });
+    }
+    insert(post) {
+        return new Promise((resolve, reject) => {
+            var request = new sql.Request();
+            request.input('Title', sql.NVarChar(50), post.title);
+            request.input('Type', sql.VarChar(50), post.type);
+            request.input('Thumb', sql.NVarChar(250), post.thumb);
+            request.input('Path', sql.NVarChar(250), post.path);
+            request.input('Description', sql.NVarChar(max), post.description);
+            request.input('MemberId', sql.Int, post.memberId);
+            request.input('Duration', sql.VarChar(50), '10:00:00');
+            request.input('Status', sql.Int, 1);
+            request.input('CreatedDate', sql.DateTime, new Date());
+            request.query('insert into Post(Title,Type,Thumb,Path,MemberId,Status,Duration,CreatedDate, Description) values(@Title, @Type, @Thumb, @Path, @MemberId, @Status, @Duration, @CreatedDate, @Description)').then(result => {
+                if (result.rowsAffected == 1) {
+                    return resolve(response.success());
+                } else {
+                    return resolve(response.error('Đã có lỗi xảy ra!'));
+                }
+            }).catch(err => {
+                console.log(err);
+                return reject(err);
+            });
+            sql.on('error', err => {
+                console.log(err);
+                return resolve(response.error(err));
+            });
+        });
+    }
+
+    update(post) {
+        return new Promise((resolve, reject) => {
+            var request = new sql.Request();
+            request.input('Id', sql.BigInt, post.id);
+            request.query('select Title, Thumb from [Post] where Id = @Id').then(result => {
+
+                if (result.rowsAffected == 1) {
+                    var obj = result.recordset[0];
+                    var request2 = new sql.Request();
+                    request2.input('Id', sql.BigInt, post.id);
+                    request2.input('Title', sql.NVarChar(250), post.title || obj.Title);
+                    request2.input('Thumb', sql.NVarChar(500), post.thumb || obj.Thumb);
+                    request2.query('Update Post set FullName = @FullName, Avatar = @Avatar, Mobile = @Mobile Where Id = @Id').then(result => {
+                        if (result.rowsAffected == 1) {
+                            return resolve(response.success());
+                        } else {
+                            return resolve(response.error('Đã có lỗi xảy ra!'));
+                        }
+                    }).catch(err => {
+                        console.log(err);
+                        return resolve(response.error(err));
+                    });
+                } else {
+                    return resolve(response.error('Tài khoàn không tồn tại!'));
+                }
+            }).catch(err => {
+                console.log(err);
+                return reject(err);
+            });
+            sql.on('error', err => {
+                console.log(err);
+                return resolve(response.error(err));
+            });
+        });
+    }
+}
+
+module.exports = new Post();

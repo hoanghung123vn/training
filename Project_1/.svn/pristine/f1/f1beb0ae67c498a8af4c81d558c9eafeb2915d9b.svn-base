@@ -1,0 +1,20 @@
+<html>
+
+<head>
+    <title>Dekiru Support</title>
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <script src="/plugins/jquery-2.2.4.min.js"></script>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+        }
+    </style>
+</head>
+
+<body>
+    <iframe src="/chat.htm?token=eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJ1c2VyX2lkIjoiMTAwMTUiLCJuYW1lIjoiR-G6pXUgVMO6IiwiYXZhdGFyIjoiaHR0cHM6Ly9zdG9yYWdlLmRla2lydS52bi9EYXRhLzIwMTcvMDUvMDUvYW5vbnltb3VzLTUxMjYzNjI5NTkzNjY2MDgyNDk0NS5wbmciLCJjb21wYW55X2lkIjoiMSIsImlhdCI6MTQ5NDkxNjU2N30.xMkmiMExq48lAKap4IkNjjdN_qOoymHkiR9BYKn3eMc"
+        width="100%" height="100%" frameborder="0"></iframe>
+</body>
+
+</html>

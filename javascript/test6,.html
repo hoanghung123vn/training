@@ -1,0 +1,23 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta http-equiv="X-UA-Compatible" content="ie=edge">
+    <title>test 6</title>
+</head>
+
+<body>
+    <input id="name" type="text">
+    <button onclick="rev()">Reverse</button>
+    <script>
+        function rev() {
+            var name = document.getElementById("name").value;
+            var name2 = name.split("").reverse().join("");
+            alert(name2);
+        }
+    </script>
+</body>
+
+</html>

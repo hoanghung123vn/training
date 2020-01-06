@@ -1,0 +1,24 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta http-equiv="X-UA-Compatible" content="ie=edge">
+    <title>Bai 2</title>
+</head>
+
+<body>
+    <input id="name" placeholder="Input your name" type="text">
+    <input id="age" placeholder="Input your age" type="number">
+    <button onclick="display()">Display</button>
+    <script>
+        function display() {
+            var name = document.getElementById("name").value;
+            var age = document.getElementById("age").value;
+            document.write(`Your name: ${name}, your age: ${age}`);
+        }
+    </script>
+</body>
+
+</html>

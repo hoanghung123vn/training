@@ -1,0 +1,83 @@
+body{
+    background-color: #7adcdb;
+    color: #313131;
+    font-family: 'Roboto', sans-serif;
+    height: 100vh;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+}
+
+form{
+    background-color: #fff;
+    padding: 1.5rem 1rem;
+    border-radius: 20px;
+    width: 16rem;
+    height: 20rem;
+    box-shadow: 0.5px 3px 10px black;
+    text-shadow: 0.4px 0.4px 2px rgba(0, 0, 0, 0.2)
+}
+
+.input-group{
+    margin: 1rem;
+    position: relative;
+}
+
+form h2{
+    text-align: center;
+    font-weight: 400;
+    user-select: none;
+}
+
+form input{
+    color: #333;
+    display: block;
+    margin: auto;
+    border: none;
+    border-bottom: solid 1px dodgerblue;
+    outline: none;
+    padding: 6px 4px;
+}
+
+form label{
+    position: absolute;
+    top: 4px;
+    left: 20px;
+    font-weight: 400;
+    font-size: 15px;
+    pointer-events: none;
+    color: gray;
+    transition: 200ms ease;
+}
+
+input:focus + label, input:valid + label{
+    top: -14px;
+    left: 20px;
+    font-size: 13.5px;
+    color: dodgerblue;
+}
+
+form button{
+    background-image: linear-gradient(120deg, #89f7fe 0%, #66a6ff 100%);
+    
+    border: none;
+    border-radius: 2rem;
+    cursor: pointer;
+    color: white;
+    padding: 0.5rem 1rem;
+    transition: 200ms;
+    outline: none;
+    box-shadow: .5px 4px 10px rgba(0, 0, 0, 0.3);
+    width: 100%;
+}
+
+form p {
+    font-weight: 300;
+    font-size: 14px;
+    text-align: center;
+    margin-top: 2rem;
+}
+
+form p a{
+    text-decoration: none;
+}

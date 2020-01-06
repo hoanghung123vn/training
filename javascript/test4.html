@@ -1,0 +1,29 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta http-equiv="X-UA-Compatible" content="ie=edge">
+    <title>Bai 4</title>
+</head>
+
+<body>
+    <textarea id="input" type="text" onkeypress="check()"></textarea>
+    <input id="output" type="text">
+    <script>
+        function check() {
+            var input = document.getElementById("input");
+            var output = document.getElementById("output");
+            if (output.value < 300) {
+                output.value = input.value.length + 1;
+            } else {
+                alert("Khong the vuot qua 300 ky tu");
+            }
+
+        }
+
+    </script>
+</body>
+
+</html>

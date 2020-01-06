@@ -1,0 +1,34 @@
+body{
+    margin: 0;
+    padding: 0;
+    background-color: #cecece;
+    min-height: 100vh;;
+    color: #333;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+}
+.title{
+    margin: 0;
+    text-align: center;
+    color: red;
+    font-weight: 400;
+    font-family: 'Roboto', sans-serif;
+    width: 100%;
+    background-color: #fff;
+    position: fixed;
+    top: 0;
+    left: 0;
+    padding: 16px 0;
+    box-shadow: 0 2px 5px rgba(0, 0, 0, 0.2)
+}
+
+.container{
+    margin-top: auto;
+    display: flex;
+}
+
+.left-container img{
+    width: 200px;
+    height: 200px;
+}

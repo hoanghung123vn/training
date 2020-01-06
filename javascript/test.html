@@ -1,0 +1,26 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta http-equiv="X-UA-Compatible" content="ie=edge">
+    <title>Bai 1</title>
+</head>
+
+<body>
+    <input id="number" type="number">
+    <input id="price" type="number">
+    <input id="cost" type="number">
+    <button id="calculate" onclick="cal()">Calculate</button>
+    <script>
+        function cal() {
+            number = document.getElementById("number").value;
+            price = document.getElementById("price").value;
+            cost = document.getElementById("cost");
+            cost.value = number * price;
+        }
+    </script>
+</body>
+
+</html>

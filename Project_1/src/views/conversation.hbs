@@ -1,0 +1,12 @@
+<ul>
+    {{#each conversations}}
+    <li data-id="{{id}}" class="dchat-conversation-item" data-type="{{type}}">
+        <div class="deriku-image-wraper">
+            <img src="{{avatar}}" alt="{{title}}" class="{{avatarCls}}" data-name="{{avatar}}">
+        </div>
+        <time class="time timeago">{{moment lastmodified_date format="DD/MM HH:mm"}}</time>
+        <b>{{title}}</b> 
+        <i class="truncate">{{{lastest_message}}}</i>
+    </li>
+    {{/each}}
+</ul>

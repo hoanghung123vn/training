@@ -1,0 +1,23 @@
+ {{#each messages}}
+<li data-temp-id="{{temp_id}}" data-id="{{_id}}" class="dchat-message-item {{cls}}" data-type="{{type}}" data-parent-id="{{parent_id}}"
+    data-created-by="{{created_by}}">
+    {{#unless is_my_message}}
+    <div class="deriku-image-wraper">
+        <img src="{{avatar}}" alt="{{title}}" class="{{avatarCls}}" data-name="{{avatar}}">
+    </div>
+    {{/unless }}
+    <ul class="dchat-message-item-list">
+        {{#if is_file}}
+        <li data-temp-id="" data-id="{{_id}}" class="dchat-message-item-child {{cls}}" data-type="{{type}}" data-parent-id="{{parent_id}}"
+            title="{{created_by_name}} - {{created_date}}" data-temp-file-id="{{payload.id}}" data-file-url="{{payload.url}}">
+            <span>{{{content}}}</span> </li>   
+            {{else}}
+            <li data-temp-id="" data-id="{{_id}} " class="dchat-message-item-child {{cls}}" data-type="{{type}}" data-parent-id="{{parent_id}}" title="{{created_by_name}} - {{created_date}}">
+            <span>{{{content}}}</span> </li>
+        {{/if}} 
+        {{>message-child this}}
+    </ul> {{!--
+    <time class="time timeago " datetime="{{moment created_date format=" YYYY-MM-DDTHH:mm:ss " }}Z
+            ">{{moment created_date format="YYYY-MM-DDTHH:mm:ss "}}Z</time>--}}
+</li>
+{{/each}} {{!--- {{moment created_date format="MMM Do YY "}}--}}

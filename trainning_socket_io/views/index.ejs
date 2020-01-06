@@ -1,0 +1,38 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta http-equiv="X-UA-Compatible" content="ie=edge">
+    <link rel="stylesheet" href="/css/style.css">
+    <title>WebSocket</title>
+</head>
+<body>
+    <div id="wrapper"> 
+        <div id="login">
+            <h3>Your name</h3>
+            <input id="textField" type="text">
+            <button id="btnLogin">Login</button>
+        </div>
+        <div id="chat">
+            <div id = "left">
+                <div id="boxTitle">Users Online</div>
+                <div id="boxContent">Hung</div>
+            </div>
+            <div id = "right">
+                <div id="sayHi">Hello
+                    <span id="username">Hung, </span>
+                    <button id="btnlogout">Logout</button>
+                </div>
+                <div id="listMessage">
+
+                </div>
+                <input type="text" id="txtMessage">
+                <button id="sendMessage">Send</button>
+            </div>
+        </div>
+    </div>
+    <script src="socket.io/socket.io.js"></script>
+    <script src="/js/socket.js"></script>
+</body>
+</html>

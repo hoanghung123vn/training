@@ -1,0 +1,90 @@
+<!DOCTYPE html>
+<html>
+
+<head>
+    <title>Dekiru Chat Room</title>
+    {{!--
+    <meta name="viewport" content="width=device-width, initial-scale=1" /> --}}
+    <meta http-equiv="Content-Type" content="text/html; charset=UTF-8" />
+    <script src="/dist/plugins/jquery-2.2.4.min.js"></script>
+    <script src="/socket.io/socket.io.js"></script>
+    <script src="/dist/plugins/handlebars.min.js"></script>
+    <script src="/dist/plugins/dekiru.avatar.js"></script>
+    <script src="/dist/plugins/emoticons.js"></script>
+    <script src="/dist/libs.js" type="text/javascript"></script>
+    <link rel="stylesheet" href="/dist/chat/emoticon02.css" />
+    <script src="/dist/chat/emoticon02.js" type="text/javascript"></script>
+    <link rel="stylesheet" href="/dist/chat/room-styles.css?v=5" />
+    <script src="/dist/plugins/jqueryupload/jquery.ui.widget.js"></script>
+    <script src="/dist/plugins/jqueryupload/jquery.iframe-transport.js"></script>
+    <script src="/dist/plugins/jqueryupload/jquery.fileupload.js"></script>
+    <script src="/dist/plugins/jquery.particleground.min.js"></script>
+    <script src="/dist/plugins/Autolinker.min.js"></script>
+    <script src="/dist/plugins/moment-with-locales.js"></script>
+    <script src="/dist/plugins/jquery-ui/jquery-ui.js"></script>
+    <link rel="stylesheet" href="/dist/plugins/jquery-ui/jquery-ui.css">
+    <link rel="stylesheet" href="/dist/plugins/mention/jquery.mentions.css" />
+    <script src="/dist/plugins/mention/jquery.mentions.js"></script>
+    <script type="text/javascript">
+        var global_token = '{{token}}';
+        var global_member = {{{member }}};
+        var storageServiceUrl = '{{storageServiceUrl}}';
+        var storageDomain = '{{storageDomain}}';
+        var realtimeDomain = '{{realtimeDomain}}';
+        var parentDomain = '{{parentDomain}}';
+        var room = '{{room}}';
+    </script>
+    <script src="/dist/chat-room.js?v=5" type="text/javascript"></script>
+</head>
+
+<body class="{{style}}">
+    <script id="message-template" type="text/x-handlebars-template">
+        {{{message_template}}}
+    </script>
+    <div id="dchat-wrapper">
+        <div id="dchat-menu-trigger">Menu</div>
+        <div id="dchat-left">
+            <div id="dchat-left-conversation-list-wrapper">
+                <div id="dchat-left-conversation-list">
+
+                </div>
+            </div>
+        </div>
+        <div id="dchat-right" class="{{cls}}">
+            <div id="dchat-main-wrapper">
+                <div id="dchat-main-left" class="{{cls}}">
+                    <div id="dchat-info" class="active">
+                        <div id="dchat-info-detail">
+
+                        </div>
+                        <div id="dchat-info-overlay">
+                            <h3>5K+ thành viên</h3>
+                            <p>Nhóm dành cho tất cả các bạn chém gió & giao lưu</p>
+                        </div>
+                    </div>
+                    <div id="dchat-message-list-wrapper">
+                        <ul id="dchat-message-list"></ul>
+                    </div>
+                    <div id="dchat-input-wrapper">
+                        <div id="dchat-input-area" contenteditable="true" placeholder="Nhập nội dung..." aria-label="Nhập nội dung..." spellcheck="false"></div>
+                        <div id="dchat-input-func">
+                            <span class="common-iconv3 attach" title="Gửi file" id="dchat-file-select-wrapper">
+                                <input type="file" id="dchat-file-select"/>
+                            </span>
+                            <span class="common-iconv3 emoticon" title="Mặt cười"></span>
+                            <div class="dchat-popbox emoticon-select popbox-hide">
+                                <div class="dchat-popbox-content">
+                                    <ul id="dchat-emoticon-select">
+
+                                    </ul>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</body>
+
+</html>

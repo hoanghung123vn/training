@@ -1,0 +1,21 @@
+<style>
+    img {
+        max-width: 100px;
+        float: left;
+        margin-right: 10px;
+    }
+
+    li {
+        list-style-type: none;
+        border-bottom: solid 1px #ccc;
+        line-height: 100px;
+        height: 100px;
+    }
+</style>
+{{#each companies}}
+<li data-id="{{id}}">
+    <img src="{{avatar}}" />
+    <b>{{name}}</b>
+    <p>{{members}}</p>
+</li>
+{{/each}}

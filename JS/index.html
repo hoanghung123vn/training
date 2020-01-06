@@ -1,0 +1,37 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <meta http-equiv="X-UA-Compatible" content="ie=edge">
+  <title>Document</title>
+  <script>
+    var outerValue = "samurai";
+    var later;
+    function outerFunction() {
+      var innerValue = "ninja";
+      function innerFunction() {
+        if (outerValue === "samurai") {
+          console.log("i can see samurai");
+        } else console.log("no samurai");
+        if (innerValue === "ninja") {
+          console.log("i can see ninja");
+        } else {
+          console.log("no ninja");
+        }
+      }
+      later = innerFunction;
+    }
+
+
+    later();
+
+  </script>
+</head>
+
+<body>
+
+</body>
+
+</html>

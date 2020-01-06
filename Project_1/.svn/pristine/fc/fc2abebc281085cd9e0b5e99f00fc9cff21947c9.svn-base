@@ -1,0 +1,10 @@
+var config = require('../../config');
+var mssql = require("mssql");
+var configSql = config.services.exam_notification.db;
+
+mssql.connect(configSql, function (err) {
+    if (err)
+        throw err;
+});
+
+module.exports = mssql; 

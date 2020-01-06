@@ -1,0 +1,39 @@
+var _ = require('lodash');
+const config = require('../../config');
+var request = require('request'),
+    url = config.mediaApi.url,
+    auth = "Basic " + new Buffer(config.mediaApi.user + ":" + config.mediaApi.pass).toString("base64");
+
+module.exports = {
+    getViewCount(liveName) {
+        return new Promise((resolve, reject) => {
+            request({
+                url: url + 'streams/live/' + liveName,
+                headers: {
+                    "Authorization": auth
+                }
+            }, function (err, res, body) {
+                if (res.statusCode != 200)
+                    return reject(body)
+                if (body)
+                    body = JSON.parse(body);
+                return resolve(body);
+            })
+        });   
+    },
+    getLiveName(postId) {
+        return new Promise((resolve, reject) => {
+            request({
+                url: url + `streams/gen-name/?app=${config.mediaApi.appName}&stream=${postId}`,
+                json: true,
+                headers: {
+                    "Authorization": auth
+                }
+            }, function (err, res, body) {
+                if (res.statusCode != 200)
+                    return reject(err)
+                return resolve(body);
+            })
+        });
+    }
+}

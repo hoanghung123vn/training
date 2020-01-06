@@ -1,0 +1,30 @@
+#left{
+    width: 30%;
+    background-color: aqua;
+    float: left;
+}
+#right{
+    width: 70%;
+    background-color: rgb(161, 228, 228);
+    float: right;
+}
+#left, #right{
+    min-height: 30px;
+}
+#boxContent, #boxTitle{
+    text-align: center;
+    padding: 5px;
+    border: solid 1px green;
+}
+#sayHi{
+    text-align: right;
+}
+#listMessage{
+    background-color: rgb(195, 230, 228);
+    min-height: 300px;
+    margin-bottom: 15px;
+}
+#txtMessage{
+    background-color: transparent;
+    border: solid 1px black;
+}

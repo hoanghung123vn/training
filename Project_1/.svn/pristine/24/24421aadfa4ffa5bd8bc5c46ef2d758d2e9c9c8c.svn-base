@@ -1,0 +1,123 @@
+var Post = require('../models/post');
+var PostLike = require('../models/postLike');
+var _ = require('lodash');
+var authenticate = require('../../middleware/authenticate');
+var response = require('../core/response');
+let Wowza = require('../lib/amela-wowza');
+wowza = new Wowza({
+    wowzaAdress: '103.15.50.182', // default value is 'localhost'
+    streamFile: 'myStream.stream', // default is 'myStream.stream'
+    application: 'live', // default is 'live'
+    appIstance: '_definst_', // default is '_definst_'
+    mediaCasterType: 'rtp', // default is 'rtp'
+    username: 'system',
+    password: '123456'
+});
+
+module.exports.run = function(app, io) {
+    app.post('/post/detail', [authenticate.checkApiSecretKey], function(req, res) {
+        var id = req.body.id || 0;
+        if (id <= 0) {
+            res.send(response.error('missing parameter @id!'));
+        } else {
+            Post.getById(id).then(function(msg) {
+                return res.jsonp(msg);
+            }).catch(err => {
+                console.log(err);
+            });
+        }
+    });
+    app.post('/post/search', [authenticate.checkApiSecretKey], function(req, res) {
+        var pageIndex = req.body.page_index || 1;
+        var pageSize = req.body.page_size || 10;
+        var zoneId = req.body.zone_id || 10;
+        var isLive = req.body.islive || -1;
+        var keyword = req.body.keyword || '';
+        var memberId = 0;
+        if (req.member)
+            memberId = req.member.Id;
+        Post.search(memberId, keyword, zoneId, isLive, pageIndex, pageSize).then(function(msg) {
+            return res.jsonp(msg);
+        }).catch(err => {
+            console.log(err);
+        });
+    });
+    app.post('/post/list-by-member', [authenticate.checkLogin], function(req, res) {
+        var pageIndex = req.body.page_index || 1;
+        var pageSize = req.body.page_size || 10;
+        Post.getListByMember(req.member.Id, pageIndex, pageSize).then(function(msg) {
+            return res.jsonp(msg);
+        }).catch(err => {
+            console.log(err);
+        });
+    });
+    app.post('/post/like', [authenticate.checkLogin], function(req, res) {
+        var postId = req.body.postId || 0;
+        if (postId == 0) {
+            res.send(response.error('missing parameter @post_id!'));
+        } else {
+            PostLike.like(postId, req.member.Id).then(function(msg) {
+                return res.jsonp(msg);
+            }).catch(err => {
+                console.log(err);
+            });
+        }
+    });
+    app.post('/post/unlike', [authenticate.checkLogin], function(req, res) {
+        var postId = req.body.postId || 0;
+        if (postId == 0) {
+            res.send(response.error('missing parameter @post_id!'));
+        } else {
+            PostLike.unLike(postId, req.member.Id).then(function(msg) {
+                return res.jsonp(msg);
+            }).catch(err => {
+                console.log(err);
+            });
+        }
+    });
+    app.post('/post/add', [authenticate.checkLogin], function(req, res) {
+        // wowza.getRecordersList({
+        //     application: 'live',
+        //     appIstance: '_definst_'
+        // }).then(response => console.log(response)).catch(errorMsg => console.log(errorMsg));
+        wowza.createRecorder({
+                //"restURI": "http://103.15.50.182:8087/v2/servers/_defaultServer_/vhosts/_defaultVHost_/applications/live/instances/_definst_/streamrecorders/myStream.stream",
+                "recorderName": "ipCameraRecorder",
+                "instanceName": "_definst_",
+                "recorderState": "Waiting for stream",
+                "defaultRecorder": true,
+                "segmentationType": "None",
+                "outputPath": "", // default value is [] and wowza save files in [install-dir]/content, not tested
+                "baseFile": "myrecord2.mp4", // default is [], and wowza will name file as a streamfile name, not tested
+                "fileFormat": "MP4",
+                "fileVersionDelegateName": "com.wowza.wms.livestreamrecord.manager.StreamRecorderFileVersionDelegate",
+                "fileTemplate": "${BaseFileName}_${RecordingStartTime}_${SegmentNumber}",
+                "segmentDuration": 900000,
+                "segmentSize": 10485760,
+                "segmentSchedule": "0 * * * * *",
+                "recordData": true,
+                "startOnKeyFrame": true,
+                "splitOnTcDiscontinuity": false,
+                "backBufferTime": 3000,
+                "option": "version", //should to work with one of: version | append | overwrite, but not tested
+                "moveFirstVideoFrameToZero": true,
+                "currentSize": 0,
+                "currentDuration": 0,
+                "recordingStartTime": ""
+            }, {
+                streamFile: 'myStreamxxxx.stream',
+                application: 'live',
+                appIstance: '_definst_',
+                username: 'system',
+                password: '123456'
+            }).then(function(response) {
+                return res.jsonp(response)
+            })
+            .catch(function(response) {
+                return res.jsonp(response)
+            });
+
+
+
+    });
+}

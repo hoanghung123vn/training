@@ -1,0 +1,11 @@
+
+const keysToCamelcase = require('keys-to-camelcase');
+
+exports.success = function (data, totalRow) {
+    if (data && typeof (data) == 'object')
+        data = keysToCamelcase(data);
+    return {success: true, errorCode: 0, message: "", data: data, totalRow: totalRow || 0}
+};
+exports.error = function(message) {
+    return {success: false, errorCode: 0, message: message, data: null, totalRow: 0}
+};

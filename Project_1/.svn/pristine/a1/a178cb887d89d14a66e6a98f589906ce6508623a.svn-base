@@ -1,0 +1,146 @@
+var Member = require('../models/member');
+var MemberFollow = require('../models/memberFollow');
+var _ = require('lodash');
+var authenticate = require('../middleware/authenticate');
+var response = require('../core/response');
+const config = require('../../config')
+const Utils = require('../core/utils')
+const passport = require('passport')
+const passportLine = require('passport-line-v2')
+passport.serializeUser((user, done) => {
+    done(null, user)
+})
+
+passport.deserializeUser(function (obj, done) {
+    done(null, obj)
+})
+
+passport.use(
+    new passportLine.Strategy(
+        {
+            channelID: config.line.id,
+            channelSecret: config.line.secret,
+            callbackURL: '',
+        },
+        (accessToken, refreshToken, profile, done) => {
+            return done(null, profile)
+        }
+    )
+)
+
+module.exports.run = function (app, io) {
+    app.get('/auth/line', passport.authenticate(passportLine.NAME, function (token, ref, profile) {
+        console.log(token)
+    })
+    );
+    app.post('/member/signup', [authenticate.checkApiSecretKey], function (req, res) {
+        var userName = req.body.user_name || '';
+        var password = req.body.password || '';
+        var email = req.body.email || '';
+        if (userName == '' || password == '' || email == '') {
+            res.send('missing parameter!');
+        } else {
+            Member.signUp(userName, password, req.body.full_name, req.body.mobile, email).then(function (msg) {
+                return res.jsonp(msg);
+            }).catch(err => {
+                console.log(err);
+            });
+        }
+    });
+    app.post('/member/signin', [authenticate.checkApiSecretKey], function (req, res) {
+        var userName = req.body.user_name || '';
+        var password = req.body.password || '';
+        var loginType = req.body.login_type || '';
+        if (loginType == 'email') {
+            if (userName == '' || password == '') {
+                res.send(response.error('missing parameter!'));
+            } else {
+                Member.signIn(userName, password).then(function (msg) {
+                    return res.jsonp(msg);
+                }).catch(err => {
+                    console.log(err);
+                });
+            }
+        }
+
+    });
+    app.post('/member/update-profile', [authenticate.checkLogin], function (req, res) {
+        var member = req.body;
+        member.memberId = req.member.Id;
+        Member.updateProfile(member).then(function (msg) {
+            return res.jsonp(msg);
+        }).catch(err => {
+            console.log(err);
+        });
+    });
+    app.post('/member/change-password', [authenticate.checkLogin], function (req, res) {
+        var password = req.body.password || '';
+        var newPassword = req.body.new_password || '';
+        var memberId = req.member.Id;
+        if (password == '')
+            res.send(response.error('missing parameter @password!'));
+        else if (newPassword == '')
+            res.send(response.error('missing parameter @new_password!'));
+        else
+            Member.changePassword(memberId, password, newPassword).then(function (msg) {
+                return res.jsonp(msg);
+            }).catch(err => {
+                console.log(err);
+            });
+    });
+    app.post('/member/twitter/token', [authenticate.checkApiSecretKey], function (req, res) {
+        var token = req.body.token || '';
+
+        if (token == '') {
+
+        } else {
+
+        }
+
+    });
+    app.post('/member/signup-line', [authenticate.checkApiSecretKey], function (req, res) {
+        var token = req.body.token || '';
+        if (token == '') {
+            res.send(response.error('missing parameter @token!'));
+        } else {
+            Utils.getLineUserByToken(token).then(function (msg) {
+                console.log(msg);
+                if (msg) {
+                    Member.signLine(msg).then(function (msg2) {
+                        return res.jsonp(msg2);
+                    }).catch(err => {
+                        return res.jsonp(err);
+                    });
+                }
+            }).catch(err => {
+                return res.jsonp(err);
+            });
+        }
+
+    });
+
+    app.post('/member/follow', [authenticate.checkLogin], function (req, res) {
+        var authorId = req.body.author_id || 0;
+        if (authorId == 0) {
+            res.send(response.error('missing parameter @author_id!'));
+        } else {
+            MemberFollow.follow(authorId, req.member.Id).then(function (msg) {
+                return res.jsonp(msg);
+            }).catch(err => {
+                console.log(err);
+            });
+        }
+    });
+    app.post('/member/unfollow', [authenticate.checkLogin], function (req, res) {
+        var authorId = req.body.author_id || 0;
+        if (authorId == 0) {
+            res.send(response.error('missing parameter @author_id!'));
+        } else {
+            MemberFollow.unFollow(authorId, req.member.Id).then(function (msg) {
+                return res.jsonp(msg);
+            }).catch(err => {
+                console.log(err);
+            });
+        }
+    });
+}

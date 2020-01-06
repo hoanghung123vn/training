@@ -1,0 +1,133 @@
+'use strict';
+const config = require('../../config'),
+    sql = require('mssql'),
+    Promise = require('bluebird'),
+    Cryptr = require('cryptr'),
+    cryptr = new Cryptr(config.EncryptKey),
+    response = require('../core/response');
+var jwt = require('jsonwebtoken');
+
+class Comment {
+    constructor() {
+
+    }
+    getById(id) {
+        return new Promise((resolve, reject) => {
+            var request = new sql.Request();
+            request.input('Id', sql.BigInt, id);
+            request.query('select Id, PostId, MemberId, ParentId, Content, Status, CreatedDate,' +
+                'likeCount from[Comment] where Id = @Id').then(result => {
+                if (result.rowsAffected == 1) {
+                    return resolve(response.success(result.recordset[0]));
+                } else {
+                    return reject(response.error('Comment not found!'));
+                }
+            }).catch(err => {
+                console.log(err);
+                return reject(err);
+            });
+            sql.on('error', err => {
+                console.log(err);
+                return reject(err);
+            });
+        });
+    }
+    
+    insert(comment) {
+        return new Promise((resolve, reject) => {
+            var request = new sql.Request();
+            request.input('postId', sql.BigInt, comment.postId);
+            request.input('MemberId', sql.Int, comment.memberId);
+            request.input('ParentId', sql.BigInt, comment.parentId);
+            request.input('Content', sql.NVarChar(max), comment.content);
+            request.input('CreatedDate', sql.DateTime, new Date());
+            request.input('Status', sql.Int, 1);
+            request.query('insert into Comment(PostId, MemberId, ParentId, Content, CreatedDate,'
+            + 'Status) values(@PostId, @MemberId, @ParentId, @Content, @CreatedDate, @Status)')
+            .then(result => {
+                if (result.rowsAffected == 1) {
+                    return resolve(response.success());
+                } else {
+                    return resolve(response.error('Đã có lỗi xảy ra'));
+                }
+            }).catch(err => {
+                console.log(err);
+                return reject(err);
+            });
+            sql.on('error', err => {
+                console.log(err);
+                return resolve(response.error(err));
+            });
+        });
+    }
+
+    update(comment) {
+        return new Promise((resolve, reject) => {
+            var request = new sql.Request();
+            request.input('Id', sql.BigInt, comment.id);
+            request.query('select Content from [Comment] where Id = @Id').then(result => {
+                if (result.rowsAffected == 1) {
+                    var obj = result.recordset[0];
+                    var request2 = new sql.Request();
+                    request2.input('Id', sql.BigInt, comment.id);
+                    request2.input('Content', sql.NVarChar(max), comment.content || obj.content);
+                    request2.query('Update Comment set Content = @Content Where Id = @Id').then(result => {
+                        if (result.rowsAffected == 1) {
+                            return resolve(response.success());
+                        } else {
+                            return resolve(response.error('Đã có lỗi xảy ra!'));
+                        }
+                    }).catch(err => {
+                        console.log(err);
+                        return resolve(response.error(err));
+                    });
+                } else {
+                    return resolve(response.error('Tài khoàn không tồn tại!'));
+                }
+            }).catch(err => {
+                console.log(err);
+                return reject(err);
+            });
+            sql.on('error', err => {
+                console.log(err);
+                return resolve(response.error(err));
+            });
+        });
+    }
+
+    delete(comment) {
+        return new Promise((resolve, reject) => {
+            var request = new sql.Request();
+            request.input('Id', sql.BigInt, comment.id);
+            request.query('select Content from [Comment] where Id = @Id').then(result => {
+                if (result.rowsAffected == 1) {
+                    var obj = result.recordset[0];
+                    var request2 = new sql.Request();
+                    request2.input('Id', sql.BigInt, comment.id);
+                    request2.input('Status', sql.NVarChar(max), 0 || 1);
+                    request2.query('Update Comment set Status = @Status Where Id = @Id').then(result => {
+                        if (result.rowsAffected == 1) {
+                            return resolve(response.success());
+                        } else {
+                            return resolve(response.error('Đã có lỗi xảy ra!'));
+                        }
+                    }).catch(err => {
+                        console.log(err);
+                        return resolve(response.error(err));
+                    });
+                } else {
+                    return resolve(response.error('Tài khoàn không tồn tại!'));
+                }
+            }).catch(err => {
+                console.log(err);
+                return reject(err);
+            });
+            sql.on('error', err => {
+                console.log(err);
+                return resolve(response.error(err));
+            });
+        });
+    }
+}
+
+module.exports = new Comment();

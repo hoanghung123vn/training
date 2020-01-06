@@ -1,0 +1,36 @@
+<html>
+
+<head>
+    <script src="https://code.jquery.com/jquery-2.2.4.min.js" integrity="sha256-BbhdlvQf/xTY9gja0Dq3HiwQF8LaCRTXxZKRutelT44="
+        crossorigin="anonymous"></script>
+    <script src="/notification.js"></script>
+    <script src="/socket.io/socket.io.js"></script>
+    <script src="/plugins/growl/jquery.growl.js"></script>
+    <link href="/plugins/growl/jquery.growl.css" rel="stylesheet" />
+    <script>
+        $(function () {
+            DW.Notification.Init({
+                token: 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJ1c2VyX2lkIjoxMDAxNSwicm9sZSI6MCwicmVnaXN0cmF0aW9uX2lkIjoiMCIsImlhdCI6MTQ5NDIyNTI0Nn0.FtlnCedb_6dtmHYyN7c5rSwMMWRucyM_qArqfoUH-ao',
+                onNotify: function (data) {
+                    console.log(data);
+                    $.growl.notice({
+                        title: 'Thông báo!',
+                        message: data.content,
+                        url: 'https://beta.dekiru.vn/exam/preview-52.htm',
+                        duration: 15000
+                    });
+                }
+            });
+            $.growl({ title: 'Thông báo', message: "Bài viết ABC của bạn đã bị xóa!", duration: 100000 });
+            $.growl.error({ title: 'Thông báo', message: "Bài viết ABC của bạn đã bị xóa!", duration: 100000 });
+            $.growl.notice({ title: 'Thông báo', message: "Bạn vừa được +5 coin!", duration: 100000 });
+            $.growl.warning({ title: 'Thông báo', message: "Tài khoản của bạn sắp hết hạn, hãy nạp thêm tiền :D", duration: 100000 });
+        });
+    </script>
+</head>
+
+<body>
+
+</body>
+
+</html>

@@ -1,0 +1,45 @@
+#growls {  z-index: 50000;  position: fixed; font-family: Arial, Helvetica, sans-serif; cursor: pointer;}
+
+  #growls.default {    top: 10px;    right: 10px; }
+  #growls.tl {    top: 10px;    left: 10px; }
+  #growls.tr {    top: 10px;    right: 10px; }
+  #growls.bl {    bottom: 10px;    left: 10px; }
+  #growls.br {    bottom: 10px;    right: 10px; }
+  #growls.tc {    top: 10px;    right: 10px;    left: 10px; }
+  #growls.bc {    bottom: 10px;    right: 10px;    left: 10px; }
+  #growls.tc .growl, #growls.bc .growl {    margin-left: auto;    margin-right: auto; }
+.growl {  opacity: 0.8;  filter: alpha(opacity=80);  position: relative;  border-radius: 4px;  -webkit-transition: all 0.4s ease-in-out;  -moz-transition: all 0.4s ease-in-out;  transition: all 0.4s ease-in-out; }
+  .growl.growl-incoming {    opacity: 0;    filter: alpha(opacity=0); }
+  .growl.growl-outgoing {    opacity: 0;    filter: alpha(opacity=0); }
+  .growl.growl-small {    width: 200px;    padding: 1px;    margin: 5px; }
+  .growl.growl-medium {    width: 250px;    padding: 1px;    margin: 10px; }
+  .growl.growl-large {    width: 300px;    padding: 1px;    margin: 15px; }
+  .growl.growl-default {      color: #FFF;    background: rgba(35, 37, 36, 0.91);  }
+  .growl.growl-error {    color: #FFF;    background: #C0392B; }
+  .growl.growl-notice {    color: #FFF;    background: rgba(35, 37, 36, 0.91); }
+  .growl.growl-warning {    color: #FFF;    background: #F39C12; }
+  .growl .growl-close {      cursor: pointer;
+    float: right;
+    font-size: 12px;
+    line-height: 14px;
+    font-family: tahoma;
+    margin-right: 4px;
+    background: #fff;
+    height: 14px;
+    width: 14px;
+    border-radius: 10px;
+    color: #333;
+    text-align: center;
+    font-weight: bold;
+    margin-top: 5px;}
+      .growl.growl-error .growl-title {
+        border-bottom: solid 1px #f96363;
+      }
+      .growl.growl-warning .growl-title {
+         border-bottom: solid 1px #ffbd85;
+      }
+  .growl .growl-title {    font-size: 13px;    line-height: 13px; padding:5px 10px; border-bottom:solid 1px #5f5f5f;}
+  .growl .growl-message {    font-size: 13px;    line-height: 18px; padding:10px; }
+.growl:hover{
+  opacity: 1;
+}

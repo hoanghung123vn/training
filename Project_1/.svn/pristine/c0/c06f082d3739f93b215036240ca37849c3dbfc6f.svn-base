@@ -1,0 +1,78 @@
+var Comment = require('../models/comment');
+var _ = require('lodash');
+var authenticate = require('../../middleware/authenticate');
+var response = require('../core/response');
+
+module.exports.run = (app, io) => {
+    app.post('/comment/add', [authenticate.checkLogin], (req, res) => {
+        var comment = req.body;
+        commentPost = {
+            PostId: comment.postId,
+            MemberId: req.member.Id,
+            ParentId: comment.parentId,
+            Content: comment.content
+        }
+        Comment.insert(commentPost).then((msg) => {
+            return res.jsonp(msg);
+        }).catch(err => {
+            console.log(err);
+        });
+    });
+
+    app.post('/comment/remove', [authenticate.checkLogin], (req, res) => {
+        var id = req.body.id;
+        if (id <= 0) {
+            res.send(response.error('missing parameter @id!'));
+        } else {
+            Comment.hide(id).then((msg) => {
+                return res.jsonp(msg);
+            }).catch(err => {
+                console.log(err);
+            });
+        }
+    });
+
+    app.post('/comment/edit', [authenticate.checkLogin], (req, res) => {
+        var id = req.body.id;
+        var newContent = req.body.content;
+        if (id <= 0) {
+            res.send(response.error('missing parameter @id!'));
+        } else {
+            Comment.update(id, newContent).then((msg) => {
+                return res.jsonp(msg);
+            }).catch(err => {
+                console.log(err);
+            });
+        }
+    });
+
+    app.post('/comment/search', [authenticate.checkApiSecretKey], (req, res) => {
+        var PostId = req.body.postId || 0;
+        var pageSize = req.body.pageSize || 10;
+        var pageIndex = req.body.pageIndex || 1;
+        if (PostId <= 0) {
+            res.send(response.error('missing parameter @postId!'));
+        } else {
+            Comment.getCommentsByPostId(PostId, pageSize, pageIndex).then(function (msg) {
+                return res.jsonp(msg);
+            }).catch(err => {
+                console.log(err);
+            });
+        }
+    });
+
+    app.get('/comment/children', [authenticate.checkApiSecretKey], (req, res) => {
+        var ParentId = req.body.ParentId || 0;
+        var pageSize = req.body.pageSize || 10;
+        var pageIndex = req.body.pageIndex || 1;
+        if (ParentId <= 0) {
+            res.send(response.error('missing parameter @id!'));
+        } else {
+            Comment.getCommentsByParentId(ParentId, pageSize, pageIndex).then(function (msg) {
+                return res.jsonp(msg);
+            }).catch(err => {
+                console.log(err);
+            });
+        }
+    });
+}

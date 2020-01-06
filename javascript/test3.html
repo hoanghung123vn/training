@@ -1,0 +1,31 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta http-equiv="X-UA-Compatible" content="ie=edge">
+    <title>Bai 3</title>
+</head>
+
+<body>
+    <input id="number" type="number">
+    <button id="check" onclick="check()">Check</button>
+    <script>
+        function check() {
+            var number = document.getElementById("number").value;
+            if (number == 5) {
+                alert("Chuc mung ban da qua mon hoc");
+            } else if (number == 8) {
+                alert("Chuc mung ban da dat diem B");
+            } else if (number == 9) {
+                alert("Chuc mung ban da dat diem A");
+            } else {
+                alert("FAIL");
+            }
+        }
+
+    </script>
+</body>
+
+</html>

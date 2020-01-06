@@ -1,0 +1,188 @@
+'use strict';
+const config = require('../../config'),
+    sql = require('mssql'),
+    Pool = require('../core/mssql'),
+    Promise = require('bluebird'),
+    Cryptr = require('cryptr'),
+    cryptr = new Cryptr(config.EncryptKey),
+    response = require('../core/response');
+var jwt = require('jsonwebtoken');
+
+class Comment {
+    constructor() {
+
+    }
+    getById(id) {
+        return new Promise((resolve, reject) => {
+            Pool.mainDb().then(function (db) {
+                var request = db.request();
+                request.input('Id', sql.BigInt, id);
+                request.query('select * from[Comment] where Id = @Id').then(result => {
+                    if (result.rowsAffected == 1) {
+                        return resolve(response.success(result.recordset[0]));
+                    } else {
+                        return reject(response.error('Comment not found!'));
+                    }
+                }).catch(err => {
+                    console.log(err);
+                    return reject(err);
+                });
+            }).catch(err => {
+                return resolve(response.error(err));
+            });
+        });
+    }
+
+    insert(comment) {
+        return new Promise((resolve, reject) => {
+            Pool.mainDb().then(function (db) {
+                var request = db.request();
+                request.input('PostId', sql.BigInt, comment.PostId);
+                request.input('MemberId', sql.Int, comment.MemberId);
+                request.input('ParentId', sql.BigInt, comment.ParentId);
+                request.input('Content', sql.NVarChar(4000), comment.Content);
+                request.input('CreatedDate', sql.DateTime, new Date());
+                request.input('Status', sql.Int, 1);
+                request.query(`insert into Comment(PostId, MemberId, ParentId, Content, CreatedDate,Status) 
+                                values(@PostId, @MemberId, @ParentId, @Content, @CreatedDate, @Status);
+                                Select * From Comment Where Id = @@IDENTITY`)
+                    .then(result => {
+                        return resolve(response.success(result.recordset[0]));
+                    }).catch(err => {
+                        console.log(err);
+                        return reject(err);
+                    });
+            }).catch(err => {
+                return resolve(response.error(err));
+            });
+        });
+    }
+
+    update(id, newContent) {
+        return new Promise((resolve, reject) => {
+            Pool.mainDb().then(function (db) {
+                var request = db.request();
+                request.input('Id', sql.BigInt, id);
+                request.query('select * from [Comment] where Id = @Id').then(result => {
+                    if (result.rowsAffected == 1) {
+                        var obj = result.recordset[0];
+                        request.input('Id', sql.BigInt, id);
+                        request.input('NewContent', sql.NVarChar(4000), newContent || obj.content);
+                        request.query('Update Comment set Content = @NewContent Where Id = @Id').then(result => {
+                            if (result.rowsAffected == 1) {
+                                obj.content = newContent;
+                                return resolve(response.success(obj));
+                            } else {
+                                return resolve(response.error('Đã có lỗi xảy ra!'));
+                            }
+                        }).catch(err => {
+                            console.log(err);
+                            return resolve(response.error(err));
+                        });
+                    } else {
+                        return resolve(response.error('Tài khoàn không tồn tại!'));
+                    }
+                }).catch(err => {
+                    console.log(err);
+                    return reject(err);
+                });
+            }).catch(err => {
+                return resolve(response.error(err));
+            });
+        });
+    }
+
+    hide(id) {
+        return new Promise((resolve, reject) => {
+            Pool.mainDb().then(function (db) {
+                var request = db.request();
+                request.input('Id', sql.BigInt, id);
+                request.query('select Id from [Comment] where (Id = @Id) or (ParentId = @Id)')
+                    .then(result => {
+                        if (result) {
+                            request.input('Id', sql.BigInt, id);
+                            request.input('Status', sql.NVarChar(4000), 0);
+                            request.query('Update Comment set Status = @Status Where (Id = @Id) or (ParentId = @Id)')
+                                .then(result => {
+                                    if (result) {
+                                        return resolve(response.success(result.recordset));
+                                    } else {
+                                        return resolve(response.error('Đã có lỗi xảy ra!'));
+                                    }
+                                }).catch(err => {
+                                    console.log(err);
+                                    return resolve(response.error(err));
+                                });
+                        } else {
+                            return resolve(response.error('Tài khoàn không tồn tại!'));
+                        }
+                    }).catch(err => {
+                        console.log(err);
+                        return reject(err);
+                    });
+            }).catch(err => {
+                return resolve(response.error(err));
+            });
+        });
+    }
+    getCommentsByParentId(parentId, pageSize, pageIndex) {
+        return new Promise((resolve, reject) => {
+            var TotalRows = 0;
+            Pool.mainDb().then(function (db) {
+                var request = db.request();
+                request.input('ParentId', sql.BigInt, parentId);
+                request.input('PageIndex', sql.Int, pageIndex);
+                request.input('PageSize', sql.Int, pageSize);
+                request.output('TotalRows', sql.Int, TotalRows);
+                request.query('SELECT * FROM  (SELECT *,row_number() OVER (Order By CreatedDate DESC) AS RowNum ' +
+                    'FROM Comment WHERE ParentId = @ParentId) AS M WHERE RowNum BETWEEN((@PageIndex - 1) * @PageSize + 1) ' +
+                    'AND (@PageIndex * @PageSize) Order By M.CreatedDate DESC; SELECT @TotalRows = COUNT(0) FROM Comment')
+                    .then(result => {
+                        if (result) {
+                            return resolve(response.success(result.recordset, result.output.TotalRows));
+                        } else {
+                            return resolve(response.error('Đã có lỗi xảy ra!'));
+                        }
+                    }).catch(err => {
+                        console.log(err);
+                        return reject(err);
+                    });
+            }).catch(err => {
+                return resolve(response.error(err));
+            });
+        });
+    }
+    getCommentsByPostId(postId, pageSize, pageIndex) {
+        return new Promise((resolve, reject) => {
+            Pool.mainDb().then(function (db) {
+                var request = db.request();
+                var TotalRows = 0;
+                request.input('PostId', sql.BigInt, postId);
+                request.input('ParentId', sql.BigInt, 0);
+                request.input('PageIndex', sql.Int, pageIndex);
+                request.input('PageSize', sql.Int, pageSize);
+                request.output('TotalRows', sql.Int, TotalRows);
+
+                request.query(`SELECT * FROM  (SELECT *, row_number() OVER (Order By CreatedDate DESC) AS RowNum 
+                                FROM Comment where (PostId = @PostId) and (ParentId = @ParentId)) AS M
+                                WHERE RowNum BETWEEN((@PageIndex - 1) * @PageSize + 1)
+                                AND (@PageIndex * @PageSize) Order By M.CreatedDate DESC;
+                                SELECT @TotalRows = COUNT(0) FROM Comment where (PostId = @PostId)`)
+                    .then(result => {
+                        if (result) {
+                            return resolve(response.success(result.recordset, result.recordset.TotalRows));
+                        } else {
+                            return resolve(response.error('Đã có lỗi xảy ra!'));
+                        }
+                    }).catch(err => {
+                        console.log(err);
+                        return reject(err);
+                    });
+            }).catch(err => {
+                return resolve(response.error(err));
+            });
+        });
+    }
+}
+
+module.exports = new Comment();

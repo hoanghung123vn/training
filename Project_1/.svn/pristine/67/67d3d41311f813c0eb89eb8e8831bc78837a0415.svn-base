@@ -1,0 +1,11 @@
+{{#each child_messages}}
+ {{#if is_file}}
+<li data-temp-id="{{temp_id}}" data-id="{{_id}}" class="dchat-message-item-child {{cls}}" data-type="{{type}}" data-parent-id="{{parent_id}}" title="{{created_by_name}} - {{created_date}}" data-temp-file-id="{{payload.id}}" data-file-url="{{payload.url}}">    
+    <span>{{{content}}}</span> </li>
+    {{else}}
+    <li data-temp-id="{{temp_id}}" data-id="{{_id}}" class="dchat-message-item-child {{cls}}" data-type="{{type}}" data-parent-id="{{parent_id}}" title="{{created_by_name}} - {{created_date}}">
+    <span>{{{content}}}</span> </li>
+    {{/if}}
+{{/each}}
+
+ {{!--- {{moment created_date format="MMM Do YY"}}--}}
