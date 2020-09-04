@@ -28,7 +28,7 @@
         "md5": "^2.2.1",
         "memory-cache": "0.2.0",
         "moment": "^2.18.1",
-        "mongodb": "^2.2.25",
+        "mongodb": "^3.1.13",
         "mongoose": "^4.9.6",
         "mongoose-paginate": "^5.0.3",
         "mssql": "^4.0.4",
