@@ -48,7 +48,7 @@
         "multer-s3": "2.9.0"
     },
     "devDependencies": {
-        "gulp": "^3.9.1",
+        "gulp": "^4.0.2",
         "gulp-csso": "^3.0.0",
         "gulp-minify": "0.0.15",
         "gulp-replace": "^0.6.1",
